@@ -1,0 +1,70 @@
+.ext-counts {
+  margin: 5px 0;
+}
+
+.js-issue-row .ext-counts {
+  display: inline-block;
+  margin: 0;
+}
+
+.js-issue-row .ext-counts .badge {
+  padding: 3px 6px;
+}
+
+.badge {
+  display: inline-block;
+  margin-right: 2px;
+  padding: 4px 8px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.badge-estimated {
+  background-color: rgba(36, 41, 46, .9);
+}
+
+.badge-consumed {
+  background-color: rgba(36, 41, 46, .4);
+}
+
+.color-estimated {
+  color: rgba(36, 41, 46, .9);
+}
+
+.color-consumed {
+  color: rgba(36, 41, 46, .4);
+}
+
+.ext-total {
+  margin-left: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(36, 41, 46);
+}
+
+.ext-total .consumed {
+  font-size: 13px;
+}
+
+.ext-project-total {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.ext-project-total > span:first-child {
+  margin-right: 10px;
+}
+
+.ext-project-total .point {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.ext-download {
+  margin-left: 10px;
+  text-decoration: none !important;
+}
