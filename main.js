@@ -89,7 +89,7 @@ function updateProjects() {
     const totalElement = column.querySelector('span.ext-total');
     const titleColumnText = columnCountElement.textContent;
 
-    column.querySelectorAll('div.issue-card').forEach((card) => {
+    column.querySelectorAll('article.issue-card').forEach((card) => {
       let parsed = card.dataset.cardTitle.match(regEstimated);
       const estimatedPointsMin = parsed ? parsed[1] : 0;
       const estimatedPointsMax = parsed ? (parsed[3] || parsed[1]) : 0;
