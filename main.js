@@ -11,8 +11,8 @@ chrome.runtime.sendMessage({}, () => {
 });
 
 const splitPath = window.location.pathname.split('/');
-const regEstimated = /\[(\d+)(-(\d+))?\]/; // match with [x] or [x-y]
-const regConsumed = /\((\d+)?\)/; // match with (x)
+const regConsumed = /\[([0-9\.]*)\]/; // match with [x] or [x-y]
+const regEstimated = /\(([0-9\.]*)\)/; // match with (x)
 
 function start() {
   const currentPage = splitPath[3];
@@ -90,10 +90,41 @@ function updateProjects() {
     const titleColumnText = columnCountElement.textContent;
 
     column.querySelectorAll('article.issue-card').forEach((card) => {
-      let parsed = card.dataset.cardTitle.match(regEstimated);
-      const estimatedPointsMin = parsed ? parsed[1] : 0;
-      const estimatedPointsMax = parsed ? (parsed[3] || parsed[1]) : 0;
+        let estimatedPointsMin = 0;
+        let estimatedPointsMax = 0;
+        let consumedPoints = 0;
 
+
+        str = card.dataset.cardLabel;
+        str.substr(1, str.length-2).split(',').forEach(
+          function(label){
+            //console.log(label);
+            switch(label) {
+              case '"xl"':
+                estimatedPointsMin = 6;
+                consumedPoints = 4;
+                break;
+              case '"l"':
+                estimatedPointsMin = 3;
+                consumedPoints = 2;
+                break;
+              case '"m"':
+                estimatedPointsMin = 1;
+                consumedPoints = 1;
+                break;
+              case '"s"':
+                estimatedPointsMin = 0.5;
+                consumedPoints = 0.5;
+                break;
+            }
+           
+          }
+
+        );
+      let parsed = card.dataset.cardTitle.match(regEstimated);
+      estimatedPointsMin = parsed ? parsed[1] : estimatedPointsMin;
+      estimatedPointsMax = parsed ? (parsed[3] || parsed[1]) : estimatedPointsMax;
+      estimatedPointsMax = estimatedPointsMin;   // Désactivation des bornes pour l'instant
       if (estimatedPointsMin > 0) {
         totalEstimatedPointsMin += estimatedPointsMin * 1;
         totalColumnEstimatedMin += estimatedPointsMin * 1;
@@ -105,7 +136,7 @@ function updateProjects() {
       }
 
       parsed = card.dataset.cardTitle.match(regConsumed);
-      const consumedPoints = parsed ? parsed[1] : 0;
+      consumedPoints = parsed ? parsed[1] : consumedPoints;
 
       if (consumedPoints > 0) {
         totalConsumedPoints += consumedPoints * 1;
@@ -115,6 +146,7 @@ function updateProjects() {
       const cardTitleElement = card.querySelector('a.js-project-card-issue-link') || card.querySelector('div.js-task-list-container p');
       const issueDetailsElement = card.querySelector('div.js-project-issue-details-container') || card.querySelector('div.issue-card .pl-5.p-2');
       const countsElement = card.querySelector('div.ext-counts');
+
 
       cardTitleElement.innerHTML = cardTitleElement.innerHTML.trim().replace(regEstimated, '');
       cardTitleElement.innerHTML = cardTitleElement.innerHTML.trim().replace(regConsumed, '');
@@ -296,7 +328,7 @@ function renderTotal(consumed, estimated) {
  * @return {String}
  */
 function renderTotalProject(consumed, estimated) {
-  return `<span class="color-consumed"><span class="point">${consumed}</span> consumed</span> <span class="color-estimated"><span class="point">${estimated}</span> scheduled</span></span>`
+  return `<span class="color-consumed"><span class="point">${consumed}</span> min</span> <span class="color-estimated"><span class="point">${estimated}</span> max</span></span>`
 }
 
 /**
