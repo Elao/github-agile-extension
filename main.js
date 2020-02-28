@@ -53,6 +53,7 @@ function start() {
   
   const projectContainer = document.querySelector('.project-columns-container');
   const issuesContainer = document.querySelector('#js-repo-pjax-container');
+  const searchContainer = document.querySelector('[name="card_filter_query"]');
 
   if (projectContainer) {
     // Listen planning board changes on project page
@@ -69,6 +70,13 @@ function start() {
       childList: true,
     });
   }
+  if (searchContainer) {
+    // Listen issues changes on search
+    observer.observe(searchContainer, {
+      subtree: true,
+      childList: true,
+    });
+  }
 }
 
 /**
@@ -79,17 +87,26 @@ function updateProjects() {
   let totalConsumedPoints = 0;
   let totalEstimatedPointsMin = 0;
   let totalEstimatedPointsMax = 0;
+  
 
   document.querySelectorAll('div.project-column').forEach((column) => {
     let totalColumnConsumed = 0;
     let totalColumnEstimatedMin = 0;
     let totalColumnEstimatedMax = 0;
 
+
     const columnCountElement = column.querySelector('span.js-project-column-name');
+    const columnName = columnCountElement.innerText;
     const totalElement = column.querySelector('span.ext-total');
     const titleColumnText = columnCountElement.textContent;
+    const deadLineColumnName = ['Later', 'Done', 'Recette / Review'];
 
-    column.querySelectorAll('article.issue-card').forEach((card) => {
+    let isDeadlineEstimation = false;
+    if(deadLineColumnName.indexOf(columnName) == -1){
+      isDeadlineEstimation = true;
+    }
+
+    column.querySelectorAll('article.issue-card:not(.d-none)').forEach((card) => {
         let estimatedPointsMin = 0;
         let estimatedPointsMax = 0;
         let consumedPoints = 0;
@@ -125,20 +142,23 @@ function updateProjects() {
       estimatedPointsMin = parsed ? parsed[1] : estimatedPointsMin;
       estimatedPointsMax = parsed ? (parsed[3] || parsed[1]) : estimatedPointsMax;
       estimatedPointsMax = estimatedPointsMin;   // Désactivation des bornes pour l'instant
-      if (estimatedPointsMin > 0) {
+      if (isDeadlineEstimation &&  estimatedPointsMin > 0) {
         totalEstimatedPointsMin += estimatedPointsMin * 1;
         totalColumnEstimatedMin += estimatedPointsMin * 1;
       }
 
-      if (estimatedPointsMax > 0) {
+      if (isDeadlineEstimation &&  estimatedPointsMax > 0) {
         totalEstimatedPointsMax += estimatedPointsMax * 1;
         totalColumnEstimatedMax += estimatedPointsMax * 1;
       }
 
+
+
+
       parsed = card.dataset.cardTitle.match(regConsumed);
       consumedPoints = parsed ? parsed[1] : consumedPoints;
 
-      if (consumedPoints > 0) {
+      if (isDeadlineEstimation &&  consumedPoints > 0) {
         totalConsumedPoints += consumedPoints * 1;
         totalColumnConsumed += consumedPoints * 1;
       }
@@ -193,7 +213,7 @@ function updateProjects() {
 
     if (totalElement) {
       totalElement.innerHTML = total;
-    } else {
+    } else if(isDeadlineEstimation ) {
       const span = document.createElement('span');
       span.classList.add('ext-total');
       span.innerHTML = total;
@@ -229,15 +249,16 @@ function updateProjects() {
     downloadLink = document.createElement('a');
     downloadLink.classList.add('ext-download');
     downloadLink.href = '#';
-    downloadLink.innerHTML = '⬇';
+    downloadLink.innerHTML = '🔄';
 
     document.querySelector('div.ext-project-total').appendChild(downloadLink);
   }
 
   downloadLink.addEventListener('click', (event) => {
     event.preventDefault();
-
-    downloadCSV({ data: CSVContent });
+    updateProjects();
+    console.log('ereer');
+    //downloadCSV({ data: CSVContent });
   });
 }
 
@@ -316,7 +337,8 @@ function renderBadges(consumed, estimated) {
  * @return {String}
  */
 function renderTotal(consumed, estimated) {
-  return `<span class="color-consumed">${consumed}</span> <span class="color-estimated">${estimated}</span>`
+  average = (consumed + estimated)/2;
+  return `<span class="color-estimated">${average}</span> <span class="color-consumed">${consumed}-${estimated}</span> `
 }
 
 /** 
@@ -328,7 +350,8 @@ function renderTotal(consumed, estimated) {
  * @return {String}
  */
 function renderTotalProject(consumed, estimated) {
-  return `<span class="color-consumed"><span class="point">${consumed}</span> min</span> <span class="color-estimated"><span class="point">${estimated}</span> max</span></span>`
+  average = (consumed + estimated)/2;
+  return `<span class="color-estimated"><span class="point">${average}</span></span></span> <span class="color-consumed"><span class="point">${consumed}-${estimated}</span></span> `
 }
 
 /**
