@@ -112,32 +112,35 @@ function updateProjects() {
         let consumedPoints = 0;
 
 
-        str = card.dataset.cardLabel;
-        str.substr(1, str.length-2).split(',').forEach(
-          function(label){
-            //console.log(label);
-            switch(label) {
-              case '"xl"':
-                estimatedPointsMin = 6;
-                consumedPoints = 4;
-                break;
-              case '"l"':
-                estimatedPointsMin = 3;
-                consumedPoints = 2;
-                break;
-              case '"m"':
-                estimatedPointsMin = 1;
-                consumedPoints = 1;
-                break;
-              case '"s"':
-                estimatedPointsMin = 0.5;
-                consumedPoints = 0.5;
-                break;
+        carLabel = card.dataset.cardLabel;
+        if(carLabel){
+          carLabel.substr(1, carLabel.length-2).split(',').forEach(
+            function(label){
+              //console.log(label);
+              switch(label) {
+                case '"xl"':
+                  estimatedPointsMin = 6;
+                  consumedPoints = 4;
+                  break;
+                case '"l"':
+                  estimatedPointsMin = 3;
+                  consumedPoints = 2;
+                  break;
+                case '"m"':
+                  estimatedPointsMin = 1;
+                  consumedPoints = 1;
+                  break;
+                case '"s"':
+                  estimatedPointsMin = 0.5;
+                  consumedPoints = 0.5;
+                  break;
+              }
+             
             }
-           
-          }
-
-        );
+  
+          );
+        }
+ 
       let parsed = card.dataset.cardTitle.match(regEstimated);
       estimatedPointsMin = parsed ? parsed[1] : estimatedPointsMin;
       estimatedPointsMax = parsed ? (parsed[3] || parsed[1]) : estimatedPointsMax;
@@ -194,7 +197,7 @@ function updateProjects() {
 
       if (countsElement) {
         countsElement.innerHTML = badges;
-      } else {
+      } else  if(issueDetailsElement) {
         const div = document.createElement('div');
         div.classList.add('ext-counts');
         div.innerHTML = badges;

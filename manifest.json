@@ -1,6 +1,6 @@
 {
   "name": "GitHub Agile Extension",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "manifest_version": 2,
   "description": "Adds estimations to your Github projects planning.",
   "icons": {
